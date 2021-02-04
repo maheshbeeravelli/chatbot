@@ -178,5 +178,8 @@
       }
     }
   },
-  "defaultProject": "chat-widget"
+  "defaultProject": "chat-widget",
+  "cli": {
+    "analytics": "58105a69-2c7c-4cc5-b0f6-cee3f6e513c7"
+  }
 }

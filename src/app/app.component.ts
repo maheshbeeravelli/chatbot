@@ -4,7 +4,7 @@ import { Component } from '@angular/core'
   selector: 'app-root',
   template: `
     <chat-config [(theme)]="theme"></chat-config>
-    <chat-widget [theme]="theme"></chat-widget>
+    <chat-widget [theme]="theme" url="https://test.com"></chat-widget>
   `,
 })
 export class AppComponent {

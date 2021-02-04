@@ -1,3 +1,4 @@
+import { ChatService } from './../chat.service';
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core'
 import { Subject } from 'rxjs'
 import { fadeIn, fadeInOut } from '../animations'
@@ -32,6 +33,7 @@ const getRandomMessage = () => randomMessages[rand(randomMessages.length)]
 export class ChatWidgetComponent implements OnInit {
   @ViewChild('bottom') bottom: ElementRef
   @Input() public theme: 'blue' | 'grey' | 'red' = 'blue'
+  @Input() public url: string
 
   public _visible = false
 
@@ -48,19 +50,22 @@ export class ChatWidgetComponent implements OnInit {
       }, 0)
     }
   }
-
+  constructor(private chatService: ChatService) {}
   public focus = new Subject()
 
   public operator = {
     name: 'Operator',
     status: 'online',
-    avatar: `https://randomuser.me/api/portraits/women/${rand(100)}.jpg`,
+    avatar:'https://randomuser.me/api/portraits/lego/0.jpg'
+    // avatar: `https://cdn.dribbble.com/users/275794/screenshots/3128598/gbot_800.png`,
   }
 
   public client = {
     name: 'Guest User',
+    user: 'test_user',
     status: 'online',
-    avatar: `https://randomuser.me/api/portraits/men/${rand(100)}.jpg`,
+    // avatar: `https://randomuser.me/api/portraits/men/${rand(100)}.jpg`,
+    avatar: `https://storage.proboards.com/6172192/images/gKhXFw_5W0SD4nwuMev1.png`,
   }
 
   public messages = []
@@ -90,7 +95,7 @@ export class ChatWidgetComponent implements OnInit {
   }
 
   ngOnInit() {
-    setTimeout(() => this.visible = true, 1000)
+    setTimeout(() => (this.visible = true), 1000)
     setTimeout(() => {
       this.addMessage(this.operator, 'Hi, how can we help you?', 'received')
     }, 1500)
@@ -104,8 +109,21 @@ export class ChatWidgetComponent implements OnInit {
     if (message.trim() === '') {
       return
     }
-    this.addMessage(this.client, message, 'sent')
-    setTimeout(() => this.randomMessage(), 1000)
+    if (this.url) {
+      this.addMessage(this.client, message, 'sent')
+      this.chatService
+        .sendMessage(this.url, { sender: this.client.user, message })
+        .subscribe((resp) => {
+          if (resp) {
+            resp.forEach((message) => {
+              this.addMessage(this.operator, message.text, 'received')
+            })
+          }
+        })
+    } else {
+      this.addMessage(this.client, message, 'sent')
+      setTimeout(() => this.randomMessage(), 1000)
+    }
   }
 
   @HostListener('document:keypress', ['$event'])
@@ -117,5 +135,4 @@ export class ChatWidgetComponent implements OnInit {
       this.toggleChat()
     }
   }
-
 }
